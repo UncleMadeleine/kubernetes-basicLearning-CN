@@ -19,13 +19,13 @@
     - [建立docker镜像](#建立docker镜像)
     - [获取docker镜像](#获取docker镜像)
     - [运行容器镜像](#运行容器镜像)
-    - [Accessing your application](#accessing-your-application)
+    - [访问你的应用](#访问你的应用)
     - [列出所有正在运行的容器](#列出所有正在运行的容器)
   - [在已存在的容器中运行shell](#在已存在的容器中运行shell)
-    - [Exploring container from within](#exploring-container-from-within)
-    - [Stopping and removing a container](#stopping-and-removing-a-container)
-  - [Pushing the image to an image registry](#pushing-the-image-to-an-image-registry)
-    - [Pushing image to docker hub](#pushing-image-to-docker-hub)
+    - [从内部探索容器](#从内部探索容器)
+    - [停止并删除容器](#停止并删除容器)
+  - [将镜像推送到镜像仓库](#将镜像推送到镜像仓库)
+    - [将镜像推送到DockerHub](#将镜像推送到dockerhub)
   - [What is Kubernetes](#what-is-kubernetes)
     - [Splitting apps into microservice](#splitting-apps-into-microservice)
     - [Scaling Microservices](#scaling-microservices)
@@ -189,47 +189,47 @@ ENTRYPOINT [ "node", "app.js" ]
 
 `docker run --name kubia-container -p 8080:8080 -d kubia`
 
-This tells Docker to run a new container called **kubia-container** from the kubia image. The container will be detached from the console (`-d` flag), which means it will run in the background. `Port 8080` on the local machine will be mapped to `Port 8080` inside the container (`-p 8080:8080` option), so you can access the app through [localhost](http://localhost:8080).
+这个命令会使docker通过kubia镜像运行一个名为 **kubia-container** 的新容器。 其与终端分离 (`-d` 参数), 这表示它会在后台运行。 宿主机本地`端口 8080` 会与容器内的 `端口 8080` 匹配 (`-p 8080:8080` 参数), 所以你可以通过访问本地端口8080来查看容器 [localhost](http://localhost:8080).
 
-#### Accessing your application
+#### 访问你的应用
 
-Run in your terminal:
+在你的命令行中输入如下命令:
 
 `curl localhost:8080`
 > You’ve hit 44d76963e8e1
 
 #### 列出所有正在运行的容器
 
-You can list all your running containers with this command.
+你可以通过如下命令列出所有你正在运行的容器。
 
 `docker ps`
 
-The `docker ps` command only shows the most basic information about the containers.
+`docker ps` 这一命令只显示容器的大部分主要信息。
 
-To get additional information about a container, run this command.
+如果要获取某个容器的更多信息，可以运行以下命令。
 
 `docker inspect kubia-container`
 
-You can see all the containers by running:
+你可以通过以下命令获悉所有容器。
 
 `docker ps -a`
 
 ### 在已存在的容器中运行shell
 
-The Node.js image on which you’ve based your image contains the bash shell, so you can run the shell inside the container like this:
+你构建镜像所使用的Node.js的镜像包含了bash shell，所以你可以在你的容器里运行shell命令，例如：
 
 `docker exec -it kubia-container bash`
 
-This will run bash inside the existing **kubia-container** container. The **bash** process will have the same Linux namespaces as the main container process. This allows you to explore the container from within and see how Node.js and your app see the system when running inside the container. 
+这会在已存在的 **kubia-container** 容器中运行bash。  **bash** 进程会与容器主进程共享相同的linux命名空间（namespace）。这可以使得你从内部探索容器并观察node.js和你的应用是如何在容器内运行的。
 
-The **`-it`** option is shorthand for two options:
+**`-it`** 参数是下列两个参数的缩写：
 
-- `-i`, which makes sure STDIN is kept open. You need this for entering commands into the shell.
-- `-t`, which allocates a pseudo terminal (TTY).
+- `-i`, 用于确保 STDIN 被保持打开。你需要用它来在shell中输入指令。
+- `-t`, 用于重定向一个伪终端（TTY）。
 
-#### Exploring container from within
+#### 从内部探索容器
 
-Let’s see how to use the shell in the following listing to see the processes running in the container.
+让我们来使用下列的shell命令来观察容器中的进程。
 
 ```bash
 root@c61b9b509f9a:/# ps aux
@@ -239,51 +239,51 @@ root        11  0.1  0.1  20244  3016 pts/0    Ss   06:02   0:00 bash
 root        16  0.0  0.0  17504  2036 pts/0    R+   06:02   0:00 ps aux
 ```
 
-You see only three processes. You don’t see any other processes from the host OS.
+你只看见三个进程。你不能看见宿主机上的其它进程。
 
 
-Like having an isolated process tree, each container also has an isolated filesystem. Listing the contents of the root directory inside the container will only show the files in the container and will include all the files that are in the image plus any files that are created while the container is running (log files and similar), as shown in the following listing.
+正如像拥有一个隔离的进程树一样，每个容器也有一个隔离的文件系统。列出容器内根目录的内容将仅显示容器中的文件，并将包括镜像中的所有文件以及容器运行时创建的任何文件（日志文件或其它类似文件），如以下列表所示。
 
 ```bash
 root@c61b9b509f9a:/# ls
 app.js  bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  package-lock.json  proc  root  run  sbin  srv  sys  tmp  usr  var
 ```
 
-It contains the **app.js** file and other system directories that are part of the `node:8` base image you’re using. 
+它包含了 **app.js** 文件和其它 `node:8` （你使用的基础镜像）中的系统文件。
 
-To exit the container, you exit the shell by running the **exit** command and you’ll be returned to your host machine (like logging out of an ssh session, for example).
+你可以使用To exit the container, you exit the shell by running the **exit** 命令退出容器并返回你的宿主机（正如退出ssh会话一样）。
 
-#### Stopping and removing a container
+#### 停止并删除容器
 
 `docker stop kubia-container`
 
-This will stop the main process running in the container and consequently stop the container because no other processes are running inside the container. The container itself still exists and you can see it with **docker ps -a**. The `-a` option prints out all the containers, those running and those that have been stopped. To truly remove a container, you need to remove it with the **docker rm** command:
+这一命令会停止容器内的主进程并因此停止容器（因为容器内没有其它进程在运行）。容器本身仍会继续存在，你可以通过 **docker ps -a** 命令来查看它。 `-a` 参数会列出所有容器，包括运行中的和已经被停止的。为了真正地删除容器，年需要使用 **docker rm** 命令，例如：
 
 `docker rm kubia-container`
 
-This deletes the container. All its contents are removed and it can’t be started again.
+这一命令删除了容器。它的所有内容都被删除了，并且无法被再次重启。
 
-### Pushing the image to an image registry
+### 将镜像推送到镜像仓库
 
-The image you’ve built has so far only been available on your local machine. To allow you to run it on any other machine, you need to push the image to an external image registry. For the sake of simplicity, you won’t set up a private image registry and will instead push the image to [Docker Hub](http://hub.docker.com).
+你之前构建的镜像只在你的本地主机上可用。为了你能够在其它机器上运行它，你需要将它推送到外部的镜像仓库。为简单起见，您不需要设置私有镜像仓库，而是将镜像推送到 [Docker Hub](http://hub.docker.com)。 
 
-Before you do that, you need to re-tag your image according to Docker Hub’s rules. Docker Hub will allow you to push an image if the image’s repository name starts with your Docker Hub ID. 
+在你如此操作之前，你需要根据Docker Hub的规则将你的镜像重新定义标签（tag）。 如果你的镜像名字以你的Docker Hub的ID为开头，Docker Hub 将会允许你推送你的镜像。
 
-You create your Docker Hub ID by registering at [hub-docker](http://hub.docker.com). I’ll use my own ID (`knrt10`) in the following examples. Please change every occurrence with your own ID.
+你可以在 [hub-docker](http://hub.docker.com) 注册并创建ID。这里我将会以我的ID (`knrt10`) 为例。记得在每次尝试时改为你自己的ID。
 
-Once you know your ID, you’re ready to rename your image, currently tagged as `kubia`, to `knrt10/kubia` (replace knrt10 with your own Docker Hub ID):
+当你获知你的ID后，你可以重新命名你的镜像，由现在的 `kubia`改为 `knrt10/kubia` （用你自己的DockerHub ID替换掉 knrt10）：
 
 `docker tag kubia knrt10/kubia`
 
-This doesn’t rename the tag; it creates an additional tag for the same image. You can confirm this by listing the images stored on your system with the Docker images command, as shown in the following listing.
+这个命令不会重新命名tag，它会为这个镜像添加一个额外的tag。你可以通过列出你所有的镜像（使用docker images命令）来确认这一点，正如下面列出的：
 
 `docker images | head`
 
-As you can see, both `kubia` and `knrt10/kubia` point to the same image ID, so they’re in fact one single image with two tags.
+正如你所看见的， `kubia` 和 `knrt10/kubia` 都指向了同一个镜像ID，所以它们是同一个镜像的不同tag。
 
-#### Pushing image to docker hub
+#### 将镜像推送到DockerHub
 
-Before you can push the image to Docker Hub, you need to log in under your user ID with the **docker login** command. Once you’re logged in, you can finally push the `yourid/kubia` image to Docker Hub like this:
+在你推送你的镜像之前，你需要通过 **docker login** 命令使用你的user ID登录。 你在登录后，就可以将 `yourid/kubia` 镜像推送到DockerHub，正如下面所示：
 
 `docker push knrt10/kubia`     
 
