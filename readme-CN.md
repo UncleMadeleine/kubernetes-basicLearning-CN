@@ -26,7 +26,7 @@
     - [停止并删除容器](#停止并删除容器)
   - [将镜像推送到镜像仓库](#将镜像推送到镜像仓库)
     - [将镜像推送到DockerHub](#将镜像推送到dockerhub)
-  - [What is Kubernetes](#what-is-kubernetes)
+  - [Kubernetes是什么](#kubernetes是什么)
     - [Splitting apps into microservice](#splitting-apps-into-microservice)
     - [Scaling Microservices](#scaling-microservices)
     - [Deploying Microservices](#deploying-microservices)
@@ -287,11 +287,11 @@ app.js  bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  package-lock.jso
 
 `docker push knrt10/kubia`     
 
-### What is Kubernetes
+### Kubernetes是什么
 
-Years ago, most software applications were big `monoliths`, running either as a single process or as a small number of processes spread across a handful of servers. 
+很久之前，大多数软件应用是巨大的`屎山`（原文为“monoliths”，直译为独石柱），其作为一个独立进程或者作为少数服务器上的小数量进程进行运行。
 
-Today, these big monolithic legacy applications are slowly being broken down into smaller, independently running components called `microservices`. 
+如今，这些大型屎山式的应用程序正在慢慢分解为更小的、独立运行的组件，称为 `微服务（microservices）`. 
 
 Because microservices are `decoupled` from each other, they can be developed, deployed, updated, and scaled individually. This enables you to change components quickly and as often as necessary to keep up with today’s rapidly changing business requirements.
 
