@@ -27,9 +27,9 @@
   - [将镜像推送到镜像仓库](#将镜像推送到镜像仓库)
     - [将镜像推送到DockerHub](#将镜像推送到dockerhub)
   - [Kubernetes是什么](#kubernetes是什么)
-    - [Splitting apps into microservice](#splitting-apps-into-microservice)
-    - [Scaling Microservices](#scaling-microservices)
-    - [Deploying Microservices](#deploying-microservices)
+    - [分割应用成为微服务](#分割应用成为微服务)
+    - [微服务扩容](#微服务扩容)
+    - [部署微服务](#部署微服务)
     - [Working with Kubernetes](#working-with-kubernetes)
     - [Setting up a Kubernetes cluster](#setting-up-a-kubernetes-cluster)
   - [Running a local single node Kubernetes cluster with Minikube](#running-a-local-single-node-kubernetes-cluster-with-minikube)
@@ -293,54 +293,54 @@ app.js  bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  package-lock.jso
 
 如今，这些大型屎山式的应用程序正在慢慢分解为更小的、独立运行的组件，称为 `微服务（microservices）`. 
 
-Because microservices are `decoupled` from each other, they can be developed, deployed, updated, and scaled individually. This enables you to change components quickly and as often as necessary to keep up with today’s rapidly changing business requirements.
+因为微服务彼此间更`分离`，它们可以被独立开发、部署、更新或扩容。这使得你可以更快地更换部件以应对今日日益加快变化的业务需求。
 
-But with bigger numbers of deployable components and increasingly larger datacenters, it becomes increasingly difficult to configure, manage, and keep the whole system running smoothly. 
+但随着部署组件数量的增加和数据中心的变大，配置、管理、把持整个系统平稳运行变得日渐困难。
 
-It’s much harder to figure out where to put each of those components to achieve high resource utilization and thereby keep the hardware costs down. Doing all this manually is hard work. 
+找出降本增效的解决方案变得更加困难。用手动操作去处理这类问题会十分艰难。
 
-We need: 
+我们需要：
 
-- automation (including automatic scheduling of those components to our servers);
-- automatic configuration;
-- supervision; and 
-- failure-handling. 
+- 自动化（包括为我们的servers自动调度组件）；
+- 自动化的配置；
+- 监督；和 
+- 错误处理。
 
-This is where **Kubernetes** comes in.
+这就是为什么我们需要 **Kubernetes**。
 
-> <em>Kubernetes enables developers to deploy their applications themselves and as often as they want, without requiring any assistance from the operations (ops) team.</em>
+> <em>Kubernetes使得开发者可以在没有运维团队的协助下就能频繁得部署应用。（Kubernetes enables developers to deploy their applications themselves and as often as they want, without requiring any assistance from the operations (ops) team.）</em>
 
-But Kubernetes doesn’t solely benefit developers. It also helps the ops team by automatically monitoring and rescheduling those apps in the event of a hardware failure. 
+但是Kubernetes不止惠及开发者，它同样通过自动化管理和硬件错误时的重启惠及了运维团队。
 
-The focus for system administrators (sysadmins) shifts from supervising individual apps to mostly supervising and managing Kubernetes and the rest of the infrastructure, while Kubernetes itself takes care of the apps.
+系统运维（sysadmins）的重点从监管单个应用程序转移到主要监督和管理Kubernetes和其他基础设施，而Kubernetes负责监管应用程序。
 
-#### Splitting apps into microservice
+#### 分割应用成为微服务
 
-Each microservice runs as an independent process and communicates with other microservices through simple, well-defined interfaces (APIs). Refer to the image below:
+每一个微服务都运行一个独立的进程并和其它微服务通过简单又定义完善的接口（API）通信。依据下图：
 
 ![Microservice](https://user-images.githubusercontent.com/24803604/68068406-bf4bb200-fd54-11e9-8565-6214d30616bb.png)
 
 > <em>- Image taken from other source.</em>
 
 
-Microservices communicate through synchronous protocols such as HTTP, over which they usually expose RESTful (REpresentational State Transfer) APIs, or through asynchronous protocols such as AMQP (Advanced Message Queueing Protocol). 
+微服务通信通过同步或异步的方式，前者例如HTTP，它们经常使用RESTful (REpresentational State Transfer) API，后者则常见为消息队列。
 
-These protocols are simple, well understood by most developers, and not tied to any specific programming language. Each microservice can be written in the language that’s most appropriate for implementing that specific microservice.
+这些协议都很简单，大多数开发人员都能理解，并且不需要特殊的编程语言。每个微服务都可以被写成它们最合适的语言。
 
-Because each microservice is a standalone process with a relatively static external API, it’s possible to develop and deploy each microservice separately. A change to one of them doesn’t require changes or redeployment of any other service, provided that the API doesn’t change or changes only in a backward-compatible way.
+因为单个的微服务是带有一套静态外接API的独立进程，所以可以独立地开发和部署任何一个微服务。改变它们其中之一并不需要重新部署其余微服务，API则不需要更改或者只需要做出先后兼容的更改。
 
-#### Scaling Microservices
+#### 微服务扩容
 
-Scaling microservices, unlike monolithic systems, where you need to scale the system as a whole, is done on a per-service basis, which means you have the option of scaling only those services that require more resources, while leaving others at their original scale. Refer to the image below:
+微服务扩容，有别于屎山程序，你仅仅只需要扩容那些需要更多资源的服务，而让其它服务保持原有的规模。如下图所示：
 
 ![Scaling](https://user-images.githubusercontent.com/24803604/68068433-03d74d80-fd55-11e9-87fe-5fad885168d1.png)
 
 > <em>- Image taken from other source.</em>
 
-When a monolithic application can’t be scaled out because one of its parts is unscalable, splitting the app into microservices allows you to horizontally scale the parts that allow scaling out. The parts that don't scale horizontally can be scaled vertically instead.
+旧有的大型应用不能被如此扩容，因为它的组件不能被单独扩容；将你的应用分离成微服务使得你可以水平得进行扩容。未能水平扩容的部分亦可进行垂直扩容。When a monolithic application can’t be scaled out because one of its parts is unscalable, splitting the app into microservices allows you to horizontally scale the parts that allow scaling out. The parts that don't scale horizontally can be scaled vertically instead.
 
 
-#### Deploying Microservices
+#### 部署微服务
 
 As always, microservices also have drawbacks. When your system consists of only a small number of deployable components, managing those components is easy. It’s trivial to decide where to deploy each component, because there aren’t that many choices. 
 
