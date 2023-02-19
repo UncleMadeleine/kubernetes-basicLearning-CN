@@ -30,14 +30,14 @@
     - [分割应用成为微服务](#分割应用成为微服务)
     - [微服务扩容](#微服务扩容)
     - [部署微服务](#部署微服务)
-    - [Working with Kubernetes](#working-with-kubernetes)
-    - [Setting up a Kubernetes cluster](#setting-up-a-kubernetes-cluster)
-  - [Running a local single node Kubernetes cluster with Minikube](#running-a-local-single-node-kubernetes-cluster-with-minikube)
-    - [Starting a Kubernetes cluster with minikube](#starting-a-kubernetes-cluster-with-minikube)
-    - [Checking to see if the cluster is up and Kubernetes can talk to it](#checking-to-see-if-the-cluster-is-up-and-kubernetes-can-talk-to-it)
-    - [Deploying your Node app](#deploying-your-node-app)
-    - [Listing Pods](#listing-pods)
-  - [Accessing your web application](#accessing-your-web-application)
+    - [用Kubernetes工作](#用kubernetes工作)
+    - [建立Kubernetes集群](#建立kubernetes集群)
+  - [在本地通过minikube运行单节点Kubernetes集群](#在本地通过minikube运行单节点Kubernetes集群)
+    - [通过minikube启动Kubernetes集群](#通过minikube启动Kubernetes集群)
+    - [检查集群是否已启用并且可以与Kubernetes通信](#检查集群是否已启用并且可以与Kubernetes通信)
+    - [部署你的节点应用](#部署你的节点应用)
+    - [列举pod](#列举pod)
+  - [访问你的Web应用](#访问你的Web应用)
     - [Creating a service object](#creating-a-service-object)
     - [Listing Services](#listing-services)
   - [Horizontally scaling the application](#horizontally-scaling-the-application)
@@ -337,38 +337,38 @@ app.js  bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  package-lock.jso
 
 > <em>- Image taken from other source.</em>
 
-旧有的大型应用不能被如此扩容，因为它的组件不能被单独扩容；将你的应用分离成微服务使得你可以水平得进行扩容。未能水平扩容的部分亦可进行垂直扩容。When a monolithic application can’t be scaled out because one of its parts is unscalable, splitting the app into microservices allows you to horizontally scale the parts that allow scaling out. The parts that don't scale horizontally can be scaled vertically instead.
+旧有的大型应用不能被如此扩容，因为它的组件不能被单独扩容；将你的应用分离成微服务使得你可以水平得进行扩容。未能水平扩容的部分亦可进行垂直扩容。
 
 
 #### 部署微服务
 
-As always, microservices also have drawbacks. When your system consists of only a small number of deployable components, managing those components is easy. It’s trivial to decide where to deploy each component, because there aren’t that many choices. 
+一直以来，微服务也有局限，当你的系统只有小部分组件组成时，管理它们显得较为容易。选择如何部署组建是微不足道的，因为并没有太多的选择。
 
-When the number of those components increases, deployment-related decisions become increasingly difficult because not only does the number of deployment combinations increase, but the number of inter-dependencies between the components increases by an even greater factor.
+当组件的数量增加，与部署有关的选择变得显著困难，因为不止是组件的数量增加了，组件间的内在联系、依赖关系也变得更为复杂。
 
-Microservices also bring other problems, such as making it hard to debug and trace execution calls, because they span multiple processes and machines. Luckily, these problems are now being addressed with distributed tracing systems such as Zipkin.
+微服务也带来了其它问题，例如难以调试和跟踪执行调用，因为它们跨越多个进程和计算机。幸运的是，这些问题现在正在通过分布式跟踪系统（如Zipkin）来解决。
 
 ![Drawback](https://user-images.githubusercontent.com/24803604/68068466-62043080-fd55-11e9-867f-971dc4df862f.png)
 
-> <em>Multiple applications running on the same host may have conflicting dependencies.</em>
+> <em>在同一主机上运行的多个应用程序可能具有冲突的依赖项</em>
 
-#### Working with Kubernetes
+#### 用Kubernetes工作
 
-Now that you have your app packaged inside a container image and made available through Docker Hub, you can deploy it in a Kubernetes cluster instead of running it in Docker directly. But first, you need to set up the cluster itself.
+现在你可以将你的应用在你的容器镜像内打包，并通过DockerHub使其可以部署在Kubernetes集群中或者直接使用docker运行。但首先，你需要建立Kubernetes集群本身。
 
-#### Setting up a Kubernetes cluster
+#### 建立Kubernetes集群
 
-Setting up a full-fledged, multi-node Kubernetes cluster isn’t a simple task, especially if you’re not well-versed in Linux and networking administration. 
+建立一个完整的、多节点的Setting up a full-fledged, multi-node Kubernetes集群不是一个简单的工作，特别是当你不熟悉linux和网络管理时。
 
-A proper Kubernetes install spans multiple physical or virtual machines and requires the networking to be set up properly so that all the containers running inside the Kubernetes cluster can connect to each other through the same flat networking space.
+一个正确的Kubernetes安装在多个物理或虚拟的机器并需要通过网络来正确建立，这样所有的Kubernetes集群中运行的容器都可以通过同样的平面网络空间建立连接。
 
-### Running a local single node Kubernetes cluster with Minikube
+### 在本地通过minikube运行单节点Kubernetes集群
 
-The simplest and quickest path to a fully functioning Kubernetes cluster is by using Minikube. Minikube is a tool that sets up a single-node cluster that’s great for both testing Kubernetes and developing apps locally.
+使用minikube是最简单而且最快的运行全功能Kubernetes集群的方式。minikube是一个可以用于建立足以用于测试Kubernetes或开发本地应用的单节点集群的工具。
 
-#### Starting a Kubernetes cluster with minikube
+#### 通过minikube启动Kubernetes集群
 
-Once you have Minikube installed locally, you can immediately start up the Kubernetes cluster with the following command:
+当你在本地安装minikube后，你可以立即启动使用以下命令启动Kubernetes：
 
 `minikube start`
 ```bash
@@ -379,14 +379,13 @@ SSH-ing files into VM...
 Kubectl is now configured to use the cluster.
 ```
 
-Starting the cluster takes more than a minute, so don’t interrupt the command before
-it completes.
+启动集群可能需要花费一分钟以上，所以不要在命令完成前打断它。
 
-#### Checking to see if the cluster is up and Kubernetes can talk to it
+#### 检查集群是否已启用并且可以与Kubernetes通信
 
-To interact with Kubernetes, you also need the **kubectl** CLI client. [Installing](https://kubernetes.io/docs/tasks/tools/install-kubectl/) it is easy.
+为了与Kubernetes交互，你需要 **kubectl** 命令行客户端， 它可以被容易地[安装](https://kubernetes.io/docs/tasks/tools/install-kubectl/) 。
 
-To verify your cluster is working, you can use the **kubectl cluster-info** command shown in the following listing.
+为了校验你的集群是否已在工作，你可以使用下面这条 **kubectl cluster-info** 命令。
 
 `kubectl cluster-info`
 ```bash
@@ -397,19 +396,19 @@ kubernetes-dashboard is running at https://192.168.99.100:8443/api/v1/...
 KubeDNS is running at https://192.168.99.100:8443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 ```
 
-This shows the cluster is up. It shows the URLs of the various Kubernetes components, including the API server and the web console.
+这表示集群已被启用，它展示了多个不同Kubernetes的组件，也包括了API server和Web控制台。
 
-#### Deploying your Node app
+#### 部署你的节点应用
 
-A simple way to deploy your app is to use the **kubectl create** command, which will create all the necessary components without having to deal with JSON or YAML.
+部署你的应用的一种简单方式是通过 **kubectl create** 命令，这会在无需JSON或者YAML的情况下创建所有的必要的组件。
 
 `kubectl create deployment kubia --image=knrt10/kubia --port=8080`
 
-The `--image=knrt10/kubia` part obviously specifies the container image you want to run, and the `--port=8080` option tells Kubernetes that your app is listening on port 8080.
+`--image=knrt10/kubia` 显然表示你想要运行的容器镜像，而 `--port=8080` 选项告知了你的应用在监听8080端口。
 
-#### Listing Pods
+#### 列举pod
 
-Because you can’t list individual containers since they’re not standalone Kubernetes objects, can you list pods instead? Yes, you can. Let’s see how to tell kubectl to list pods in the following listing.
+你不能列出单个容器，因为它们不是独立的 Kubernetes 对象，那你能列出 pod 吗？是的，你可以。让我们看看如何告诉 kubectl 在下面的列表中列出 pod。
 
 `kubectl get pods`
 
@@ -419,7 +418,7 @@ NAME                     READY   STATUS    RESTARTS   AGE
 kubia-57c4d74858-tflb8   1/1     Running   0          24s
 ```
 
-### Accessing your web application
+### 访问你的Web应用
 
 With your pod running, how do you access it? Each pod gets its own IP address, but this address is internal to the cluster and isn’t accessible from outside of it. To make the pod accessible from the outside, you’ll expose it through a Service object. 
 
