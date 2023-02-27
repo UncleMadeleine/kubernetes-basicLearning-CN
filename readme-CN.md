@@ -38,8 +38,8 @@
     - [部署你的节点应用](#部署你的节点应用)
     - [列举pod](#列举pod)
   - [访问你的Web应用](#访问你的Web应用)
-    - [Creating a service object](#creating-a-service-object)
-    - [Listing Services](#listing-services)
+    - [创建service对象](#创建service对象)
+    - [监听services](#监听services)
   - [Horizontally scaling the application](#horizontally-scaling-the-application)
     - [Increasing the desired Replica count](#increasing-the-desired-replica-count)
     - [Seeing the result of the Scale Out](#seeing-the-result-of-the-scale-out)
@@ -420,11 +420,11 @@ kubia-57c4d74858-tflb8   1/1     Running   0          24s
 
 ### 访问你的Web应用
 
-With your pod running, how do you access it? Each pod gets its own IP address, but this address is internal to the cluster and isn’t accessible from outside of it. To make the pod accessible from the outside, you’ll expose it through a Service object. 
+该如何在pod运行时访问它？每一个pod都含有它自己的IP地址，但这个地址只能在集群内交互而不能从外部访问。你必须通过service对象暴露。
 
-You’ll create a special service of type LoadBalancer because if you create a regular service (a ClusterIP service), as the pod, it would also only be accessible from inside the cluster. By creating a LoadBalancer-type service, an external load balancer will be created and you can connect to the pod through the load balancer’s public IP.
+你需要创建一个特殊的LoadBalancer类型的service，而非常规的service（一个集群内IP的service），因为它会像pod一样只能供集群内部访问。通过创建一个LoadBalancer类型的service，会有一个外部的调度器被同步创建，我们可以通过调度器的公共IP来连接内部的pod。
 
-#### Creating a service object
+#### 创建service对象
 
 To create the service, you’ll tell Kubernetes to expose the Deployment you created earlier:
 
@@ -433,7 +433,7 @@ To create the service, you’ll tell Kubernetes to expose the Deployment you cre
 
 **Important:** We’re using the abbreviation `deploy` instead of `deployments`. Most resource types have an abbreviation like this so you don’t have to type the full name (for example, `po` for `pods`, `svc` for `services`, and so on).
 
-#### Listing Services
+#### 监听services
 
 The expose command’s output mentions a service called `kubia-http`. Services are objects like Pods and Nodes, so you can see the newly created Service object by running the **kubectl get services | svc** command, as shown in the following listing.
 
