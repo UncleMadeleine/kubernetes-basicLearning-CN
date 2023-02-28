@@ -40,9 +40,9 @@
   - [访问你的Web应用](#访问你的Web应用)
     - [创建service对象](#创建service对象)
     - [监听services](#监听services)
-  - [Horizontally scaling the application](#horizontally-scaling-the-application)
+  - [应用的水平扩容](#应用的水平扩容)
     - [Increasing the desired Replica count](#increasing-the-desired-replica-count)
-    - [Seeing the result of the Scale Out](#seeing-the-result-of-the-scale-out)
+    - [查看扩容后的结果](#查看扩容后的结果)
     - [Displaying the Pod IP and Pods Node when listing Pods](#displaying-the-pod-ip-and-pods-node-when-listing-pods)
     - [Accessing Dashboard when using Minikube](#accessing-dashboard-when-using-minikube)
   - [Pods](#pods)
@@ -426,16 +426,16 @@ kubia-57c4d74858-tflb8   1/1     Running   0          24s
 
 #### 创建service对象
 
-To create the service, you’ll tell Kubernetes to expose the Deployment you created earlier:
+为了创建service，必须告诉Kubernetes暴露你之前创建的部署。
 
 `kubectl expose deploy kubia --type=LoadBalancer --name kubia-http`
 > service/kubia-http exposed
 
-**Important:** We’re using the abbreviation `deploy` instead of `deployments`. Most resource types have an abbreviation like this so you don’t have to type the full name (for example, `po` for `pods`, `svc` for `services`, and so on).
+**Important:** 我们正在使用缩写 `deploy` 代替 `deployments`。很多资源类型拥有类似的缩写，所以你无需打出它们的全名。（例如， `po` 缩写为 `pods`, `svc` 缩写为 `services`等）
 
 #### 监听services
 
-The expose command’s output mentions a service called `kubia-http`. Services are objects like Pods and Nodes, so you can see the newly created Service object by running the **kubectl get services | svc** command, as shown in the following listing.
+暴露指令的命令的输出描述了一个名为 `kubia-http` 的服务。服务是类似于pod或者node一样的对象。你可以通过 **kubectl get services | svc** 命令来查看新创建的对象，正如下面所列出的。
 
 `kubectl get svc`
 
@@ -445,17 +445,16 @@ kubernetes   ClusterIP      10.96.0.1      <none>        443/TCP          30h
 kubia-http   LoadBalancer   10.107.88.67   <pending>     8080:32718/TCP   81s
 ```
 
-**Important** :- Minikube doesn’t support LoadBalancer services, so the service will never get an external IP. But you can access the service anyway through its external port. So external IP will always be pending in that case. When using Minikube, you can get the IP and port through which you
-can access the service by running 
+**Important** :- Minikube不支持LoadBalancer的服务，所以服务永远不会得到外部IP。但你仍然可以通过外部IP访问它，所以它的外部IP将一直处于pending状态。当你使用minikube时，你可以使用以下命令访问service：
 
 `minikube service kubia-http`
 
-### Horizontally scaling the application
+### 应用的水平扩容
 
-You now have a running application, monitored and kept running by a Deployment and exposed to the world through a service. Now let’s make additional magic happen.
-One of the main benefits of using Kubernetes is the simplicity with which you can scale your deployments. Let’s see how easy it is to scale up the number of pods. You’ll increase the number of running instances to three.
+你现在拥有一个正在运行的应用，被Deployment管理和保持运行并通过service暴露自身端口。现在，让我们为它增添一点奇迹。
+使用Kubernetes的好处之一是可以方便地将部署扩容。让我们来看看增加pod的数量可以变得多么容易。你接下来会使正在运行的容器数量增加到三个。
 
-Your pod is managed by a Deployment. Let’s see it with the kubectl get command:
+你的pod被Deployment管理。让我们通过kubectl get命令查看它：
 
 `kubectl get deploy`
 
@@ -473,9 +472,9 @@ To scale up the number of replicas of your pod, you need to change the desired r
 
 You’ve now told Kubernetes to make sure three instances of your pod are always running. Notice that you didn’t instruct Kubernetes what action to take. You didn’t tell it to add two more pods. You only set the new desired number of instances and let Kubernetes determine what actions it needs to take to achieve the requested state.
 
-#### Seeing the result of the Scale Out
+#### 查看扩容后的结果
 
-Back to your replica count increase. Let’s list the Deployments again to see the updated replica count:
+再回来谈谈复制数量的增加。让我们再次列举Deployment来查看应用数量的更新。
 
 `kubectl get deploy`
 
@@ -484,7 +483,7 @@ NAME    READY   UP-TO-DATE   AVAILABLE   AGE
 kubia   3/3     3            3           6m43s
 ```
 
-Because the actual number of pods has already been increased to three (as evident from the CURRENT column), listing all the pods should now show three pods instead of one:
+因为pod的实际数量已经被增加到三个（正如 CURRENT 列所示），列出所有pod时应显示出三个，而非只有一个。
 
 `kubectl get pods`
 
@@ -495,11 +494,11 @@ kubia-57c4d74858-tflb8   1/1     Running   0          7m9s
 kubia-57c4d74858-wfgmb   1/1     Running   0          94s
 ```
 
-As you can see, three pods exist instead of one. Currently running, but if it is pending, it would be ready in a few moments, as soon as the container image is downloaded and the container is started.
+正如你所见，现在存在三个pod而非先前的一个。如果正在运行的容器处于pending状态，它会在短时间内变为ready，这通常是下载容器镜像和启动容器所需要花费的时间。
 
-As you can see, scaling an application is incredibly simple. Once your app is running in production and a need to scale the app arises, you can add additional instances with a single command without having to install and run additional copies manually.
+如你所见，扩容一个应用是如此难以置信得简单。当你的应用正在产品中在线运行并需要扩容时，你可以通过一个即时的简单命令而不需要安装或运行额外的副本。
 
-Keep in mind that the app itself needs to support being scaled horizontally. Kubernetes doesn’t magically make your app scalable; it only makes it trivial to scale the app up or down.
+记住，应用本身需要支持水平扩容。Kubernetes并非使用魔法让你的应用变得可被扩容，它只是让应用的扩容或缩容变得简单。
 
 #### Displaying the Pod IP and Pods Node when listing Pods
 
