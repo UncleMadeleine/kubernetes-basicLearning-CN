@@ -41,10 +41,10 @@
     - [创建service对象](#创建service对象)
     - [监听services](#监听services)
   - [应用的水平扩容](#应用的水平扩容)
-    - [Increasing the desired Replica count](#increasing-the-desired-replica-count)
+    - [增加应需要的副本数量](#增加应需要的副本数量)
     - [查看扩容后的结果](#查看扩容后的结果)
-    - [Displaying the Pod IP and Pods Node when listing Pods](#displaying-the-pod-ip-and-pods-node-when-listing-pods)
-    - [Accessing Dashboard when using Minikube](#accessing-dashboard-when-using-minikube)
+    - [在列举pod时展示pod的ip以及pod的节点](#在列举pod时展示pod的ip以及pod的节点)
+    - [在使用Minikube时访问面板（Dashboard）](#在使用Minikube时访问面板（Dashboard）)
   - [Pods](#pods)
     - [Examining a YAML descriptor of an existing pod](#examining-a-yaml-descriptor-of-an-existing-pod)
     - [Introducing the main parts of a POD definition](#introducing-the-main-parts-of-a-pod-definition)
@@ -463,14 +463,14 @@ NAME    READY   UP-TO-DATE   AVAILABLE   AGE
 kubia   1/1     1            1           4m58s
 ```
 
-#### Increasing the desired Replica count
+#### 增加应需要的副本数量
 
-To scale up the number of replicas of your pod, you need to change the desired replica count in the Deployment like this:
+为了顺利扩容pod的副本数量，你需要在Deployment改变应需要的副本数量（the desired replica count），方法如下：
 
 `kubectl scale deploy kubia --replicas=3`
 > deployment.apps/kubia scaled
 
-You’ve now told Kubernetes to make sure three instances of your pod are always running. Notice that you didn’t instruct Kubernetes what action to take. You didn’t tell it to add two more pods. You only set the new desired number of instances and let Kubernetes determine what actions it needs to take to achieve the requested state.
+你现在已经告诉Kubernetes确保有三个你的pod副本保持时刻运行。注意，你不是在指示Kubernetes采取何种行动。你不是告诉它增加两个pod，而是设置了一个新的“应需要的数量（the desired number）”，并让Kubernetes决定它应采取何种行动来达到你的需求。
 
 #### 查看扩容后的结果
 
@@ -500,11 +500,11 @@ kubia-57c4d74858-wfgmb   1/1     Running   0          94s
 
 记住，应用本身需要支持水平扩容。Kubernetes并非使用魔法让你的应用变得可被扩容，它只是让应用的扩容或缩容变得简单。
 
-#### Displaying the Pod IP and Pods Node when listing Pods
+#### 在列举pod时展示pod的ip以及pod的节点
 
-If you’ve been paying close attention, you probably noticed that the **kubectl get pods** command doesn’t even show any information about the nodes the pods are scheduled to. This is because it’s usually not an important piece of information.
+如果你之前集中了注意力，那么你可能已经注意到 **kubectl get pods** 命令并没有展示pod被调度的节点（node）的任何信息。这是因为这一信息在通常情况下并不重要。
 
-But you can request additional columns to display using the **-o wide** option. When listing pods, this option shows the pod’s IP and the node the pod is running on:
+但你可以通过 **-o wide** 命令请求显示这一额外内容。当列出pod时，这一命令也会同时展示pod的ip以及pod正在运行的节点（node）：
 
 `kubectl get pods -o wide`
 
@@ -516,15 +516,15 @@ kubia-57c4d74858-tflb8   1/1     Running   0          8m28s   172.17.0.3   minik
 kubia-57c4d74858-wfgmb   1/1     Running   0          2m53s   172.17.0.4   minikube   <none>           <none>
 ```
 
-#### Accessing Dashboard when using Minikube
+#### 在使用Minikube时访问面板（Dashboard）
 
-To open the dashboard in your browser when using Minikube to run your Kubernetes cluster, run the following command:
+在使用minikube运行k8s集群时，可以通过以下命令在你的浏览器中打开面板（dashboad）：
 
 `minikube dashboard`
 
 ### Pods
 
-Pods and other Kubernetes resources are usually created by posting a JSON or YAML manifest to the Kubernetes REST API endpoint. Also, you can use other, simpler ways of creating resources, such as the **kubectl run** command, but they usually only allow you to configure a limited set of properties, not all. Additionally, defining all your Kubernetes objects from YAML files makes it possible to store them in a version control system, with all the benefits it brings.
+pod和其它Kubernetes资源通常被JSON或YAML列表发送给k8s的REST API.你也可以通过其它更简单的方式来创建资源，例如 **kubectl run** 命令，Pods and other Kubernetes resources are usually created by posting a JSON or YAML manifest to the Kubernetes REST API endpoint. Also, you can use other, simpler ways of creating resources, such as the **kubectl run** command, but they usually only allow you to configure a limited set of properties, not all. Additionally, defining all your Kubernetes objects from YAML files makes it possible to store them in a version control system, with all the benefits it brings.
 
 #### Examining a YAML descriptor of an existing pod
 
