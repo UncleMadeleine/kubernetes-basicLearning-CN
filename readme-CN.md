@@ -46,8 +46,8 @@
     - [在列举pod时展示pod的ip以及pod的节点](#在列举pod时展示pod的ip以及pod的节点)
     - [在使用Minikube时访问面板（Dashboard）](#在使用Minikube时访问面板（Dashboard）)
   - [Pods](#pods)
-    - [Examining a YAML descriptor of an existing pod](#examining-a-yaml-descriptor-of-an-existing-pod)
-    - [Introducing the main parts of a POD definition](#introducing-the-main-parts-of-a-pod-definition)
+    - [检查一个已经存在的pod的yaml描述](#检查一个已经存在的pod的yaml描述)
+    - [介绍POD定义的主要部分](#介绍POD定义的主要部分)
     - [Creating a simple YAML descriptor for a pod](#creating-a-simple-yaml-descriptor-for-a-pod)
     - [Using kubectl create to create the pod](#using-kubectl-create-to-create-the-pod)
     - [Retrieving a PODs logs with Kubectl logs](#retrieving-a-pods-logs-with-kubectl-logs)
@@ -524,19 +524,19 @@ kubia-57c4d74858-wfgmb   1/1     Running   0          2m53s   172.17.0.4   minik
 
 ### Pods
 
-pod和其它Kubernetes资源通常被JSON或YAML列表发送给k8s的REST API.你也可以通过其它更简单的方式来创建资源，例如 **kubectl run** 命令，Pods and other Kubernetes resources are usually created by posting a JSON or YAML manifest to the Kubernetes REST API endpoint. Also, you can use other, simpler ways of creating resources, such as the **kubectl run** command, but they usually only allow you to configure a limited set of properties, not all. Additionally, defining all your Kubernetes objects from YAML files makes it possible to store them in a version control system, with all the benefits it brings.
+pod和其它Kubernetes资源通常被JSON或YAML列表发送给k8s的REST API.你也可以通过其它更简单的方式来创建资源，例如 **kubectl run** 命令，但它们通常只允许你配置有限的一组资源，而非全部。另外，用yaml文件定义所有你的k8s对象可以使它们能够被储存在同一个版本控制系统中。
 
-#### Examining a YAML descriptor of an existing pod
+#### 检查一个已经存在的pod的yaml描述
 
- You’ll use the **kubectl get** command with the **-o yaml** option to get the whole YAML definition of the pod, or you can use **-o json** to get the whole JSON definition as shown in the following listing.
+ 你将使用 **kubectl get** 命令和 **-o yaml** 选项来获取该pod的完整的yaml定义，或者使用 **-o json** 选项来获得完整的json定义，如下列所示：
 
 `kubectl get po kubia-bsksp -o yaml`
 
-#### Introducing the main parts of a POD definition
+#### 介绍POD定义的主要部分
 
-The pod definition consists of a few parts. First, there’s the Kubernetes API version used in the YAML and the type of resource the YAML is describing. Then, three important sections are found in almost all Kubernetes resources:
+pod的定义包含了几个部分。其一，包含了yaml中使用的k8s的API版本和yaml描述的资源的类型。其次，有三个几乎可以在任何k8s资源中被发现的重要部分：
 
-- **Metadata** includes the name, namespace, labels, and other information about the pod.
+- **元数据（Metadata）** 包括name, namespace, labels, 和pod的其它信息。
 - **Spec** contains the actual description of the pod’s contents, such as the pod’s containers, volumes, and other data.
 - **Status** contains the current information about the running pod, such as what condition the pod is in, the description and status of each container, and the pod’s internal IP and other basic info.
 
