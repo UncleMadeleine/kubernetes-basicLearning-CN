@@ -32,23 +32,23 @@
     - [部署微服务](#部署微服务)
     - [用Kubernetes工作](#用kubernetes工作)
     - [建立Kubernetes集群](#建立kubernetes集群)
-  - [在本地通过minikube运行单节点Kubernetes集群](#在本地通过minikube运行单节点Kubernetes集群)
-    - [通过minikube启动Kubernetes集群](#通过minikube启动Kubernetes集群)
-    - [检查集群是否已启用并且可以与Kubernetes通信](#检查集群是否已启用并且可以与Kubernetes通信)
+  - [在本地通过minikube运行单节点Kubernetes集群](#在本地通过minikube运行单节点kubernetes集群)
+    - [通过minikube启动Kubernetes集群](#通过minikube启动kubernetes集群)
+    - [检查集群是否已启用并且可以与Kubernetes通信](#检查集群是否已启用并且可以与kubernetes通信)
     - [部署你的节点应用](#部署你的节点应用)
     - [列举pod](#列举pod)
-  - [访问你的Web应用](#访问你的Web应用)
+  - [访问你的Web应用](#访问你的web应用)
     - [创建service对象](#创建service对象)
     - [监听services](#监听services)
   - [应用的水平扩容](#应用的水平扩容)
     - [增加应需要的副本数量](#增加应需要的副本数量)
     - [查看扩容后的结果](#查看扩容后的结果)
     - [在列举pod时展示pod的ip以及pod的节点](#在列举pod时展示pod的ip以及pod的节点)
-    - [在使用Minikube时访问面板（Dashboard）](#在使用Minikube时访问面板（Dashboard）)
+    - [在使用Minikube时访问面板（Dashboard）](#在使用minikube时访问面板dashboard)
   - [Pods](#pods)
     - [检查一个已经存在的pod的yaml描述](#检查一个已经存在的pod的yaml描述)
-    - [介绍POD定义的主要部分](#介绍POD定义的主要部分)
-    - [Creating a simple YAML descriptor for a pod](#creating-a-simple-yaml-descriptor-for-a-pod)
+    - [介绍POD定义的主要部分](#介绍pod定义的主要部分)
+    - [为pod创建一个简单的YAML描述](#为pod创建一个简单的yaml描述)
     - [Using kubectl create to create the pod](#using-kubectl-create-to-create-the-pod)
     - [Retrieving a PODs logs with Kubectl logs](#retrieving-a-pods-logs-with-kubectl-logs)
       - [Specifying the container name when getting logs of multiple container pod](#specifying-the-container-name-when-getting-logs-of-multiple-container-pod)
@@ -537,16 +537,16 @@ pod和其它Kubernetes资源通常被JSON或YAML列表发送给k8s的REST API.�
 pod的定义包含了几个部分。其一，包含了yaml中使用的k8s的API版本和yaml描述的资源的类型。其次，有三个几乎可以在任何k8s资源中被发现的重要部分：
 
 - **元数据（Metadata）** 包括name, namespace, labels, 和pod的其它信息。
-- **Spec** contains the actual description of the pod’s contents, such as the pod’s containers, volumes, and other data.
-- **Status** contains the current information about the running pod, such as what condition the pod is in, the description and status of each container, and the pod’s internal IP and other basic info.
+- **Spec** 包括pod的实际内容的描述，例如pod的容器、储存卷和其它数据。
+- **Status** 包括正在运行的pod的当前信息，例如pod的状态，每个容器的描述和状态，pod的内部IP和其它的基础信息。
 
-The status part contains read-only runtime data that shows the state of the resource at a given moment. When creating a new pod, you never need to provide the status part.
+状态部分包含只读运行时数据，用于显示资源在给定时刻的状态。创建新容器时，永远不需要提供状态部分。
 
-The three parts described previously show the typical structure of a Kubernetes API object. All other objects have the same anatomy. This makes understanding new objects relatively easy.
+前面描述的三个部分显示了 Kubernetes API 对象的典型结构。所有其他对象具有相同的解剖结构。这使得理解新对象相对容易。
 
-Going through all the individual properties in the previous YAML doesn’t make much sense, so, instead, let’s see what the most basic YAML for creating a pod looks like.
+博览学习一个 YAML 中的所有单个属性没有多大意义，因此，让我们看看用于创建 Pod 的最基本 YAML 是什么样子的。
 
-#### Creating a simple YAML descriptor for a pod
+#### 为pod创建一个简单的YAML描述
 
 You’re going to create a file called **kubia-manual.yaml** (you can create it in any directory you want), or copy from this repo, where you’ll find the file with filename [kubia-manual.yaml](https://github.com/knrt10/kubernetes-basicLearning/blob/master/kubia-manual.yaml). The following listing shows the entire contents of the file.
 
