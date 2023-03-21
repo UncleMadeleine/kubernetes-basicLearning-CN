@@ -49,11 +49,11 @@
     - [检查一个已经存在的pod的yaml描述](#检查一个已经存在的pod的yaml描述)
     - [介绍POD定义的主要部分](#介绍pod定义的主要部分)
     - [为pod创建一个简单的YAML描述](#为pod创建一个简单的yaml描述)
-    - [Using kubectl create to create the pod](#using-kubectl-create-to-create-the-pod)
-    - [Retrieving a PODs logs with Kubectl logs](#retrieving-a-pods-logs-with-kubectl-logs)
-      - [Specifying the container name when getting logs of multiple container pod](#specifying-the-container-name-when-getting-logs-of-multiple-container-pod)
-    - [Forwarding a Local Network to a port in the Pod](#forwarding-a-local-network-to-a-port-in-the-pod)
-  - [Introducing labels](#introducing-labels)
+    - [使用kubectl create创建pod](#使用kubectl-create创建pod)
+    - [通过Kubectl logs取回pod日志](#通过kubectl-logs取回pod日志)
+      - [在获取包含多个容器的pod的日志时标注容器的名称](#在获取包含多个容器的pod的日志时标注容器的名称)
+    - [为pod的端口添加本地网络](#为pod的端口添加本地网络)
+  - [介绍标签（labels）](#介绍标签labels)
     - [Specifying labels when creating a pod](#specifying-labels-when-creating-a-pod)
     - [Modifying labels of existing pods](#modifying-labels-of-existing-pods)
   - [Listing subsets of pods through label selectors](#listing-subsets-of-pods-through-label-selectors)
@@ -548,7 +548,7 @@ pod的定义包含了几个部分。其一，包含了yaml中使用的k8s的API�
 
 #### 为pod创建一个简单的YAML描述
 
-You’re going to create a file called **kubia-manual.yaml** (you can create it in any directory you want), or copy from this repo, where you’ll find the file with filename [kubia-manual.yaml](https://github.com/knrt10/kubernetes-basicLearning/blob/master/kubia-manual.yaml). The following listing shows the entire contents of the file.
+你正要创建一个名为 **kubia-manual.yaml** 的文件（你可以在任何你想要的目录下创建它），或者从仓库的 [kubia-manual.yaml](https://github.com/knrt10/kubernetes-basicLearning/blob/master/kubia-manual.yaml) 处复制。下面展示了这一文件的全部内容。
 
 ```yaml
 apiVersion: v1
@@ -564,52 +564,52 @@ spec:
       protocol: TCP
 ```
 
-Let’s examine this descriptor in detail. It conforms to the **v1** version of the Kubernetes API. The type of resource you’re describing is a pod, with the name **kubia-manual**. The pod consists of a single container based on the **knrt10/kubia** image. You’ve also given a name to the container and indicated that it’s listening on port **8080**.
+让我们来测试这一描述的细节。它表示这是 **v1** 版本的Kubernetes API。你描述的资源是一个pod，名为 **kubia-manual** 。这个pod包含了基于 **knrt10/kubia** 镜像的单个容器。你也已经给予了它名字并让它监听 **8080** 端口。
 
-#### Using kubectl create to create the pod
+#### 使用kubectl create创建pod
 
-To create the pod from your YAML file, use the **kubectl create** command:
+为了从yaml文件创建对象，使用 **kubectl create** 命令：
 
 `kubectl create -f kubia-manual.yaml`
 > pod/kubia-manual created
 
-The **kubectl create -f** command is used for creating any resource (not only pods) from a YAML or JSON file.
+**kubectl create -f** 命令被用于从yaml或json文件创建任何资源（不限于pod）。
 
-#### Retrieving a PODs logs with Kubectl logs
+#### 通过Kubectl logs取回pod日志
 
-Your little Node.js application logs to the process’s standard output. Containerized applications usually log to the standard output and standard error stream instead of writing their logs to files. This is to allow users to view logs of different applications in a simple, standard way.
+你的node.js应用通过进程的标准输出（standard output）输出日志。容器化的应用通常使用标准输出和标准错误（standard error）而不是输出日志到文件。这可以使用户在一个简单、标准化的方式下查看不同应用的日志。
 
-To see your pod’s log (more precisely, the container’s log) you run the following command on your local machine (no need to ssh anywhere):
+可以通过在你的本地机器（不需要ssh任何地方）运行下面命令来查看你的pod日志（更精确地，容器的日志）：
 
 `kubectl logs kubia-manual`
 > Kubia server starting...
 
-You haven’t sent any web requests to your Node.js app, so the log only shows a single log statement about the server starting up. As you can see, retrieving logs of an application running in Kubernetes is incredibly simple if the pod only contains a single container.
+你没有向你的node.js应用发送任何web请求，所以日志只显示了一条简单关于服务启动的日志。正如你所见，取出k8s中正在运行的应用是如此难以置信得简单（如果pod中只包含单个容器）。
 
-##### Specifying the container name when getting logs of multiple container pod 
+##### 在获取包含多个容器的pod的日志时标注容器的名称
 
-If your pod includes multiple containers, you have to explicitly specify the container name by including the **-c container name** option when running **kubectl logs**. In your kubia-manual pod, you set the container’s name to **kubia**, so if additional containers exist in the pod, you’d have to get its logs like this:
+如果你的pod包含了多个容器，你不得不在运行 **kubectl logs** 时通过 **-c container name** 选项清楚地标注容器名称。在你的kubia-manual pod中，你设置名称为**kubia**，如果所添加的容器存在于pod中，你会需要如下面所示以获取它的日志：
 
 `kubectl logs kubia-manual -c kubia`
 
-Note that you can only retrieve container logs of pods that are still in existence. When a pod is deleted, its logs are also deleted.
+注意你只能获取仍然存在的容器的日志。如果pod已经被删除，那么其日志也会一同被删除。
 
-#### Forwarding a Local Network to a port in the Pod
+#### 为pod的端口添加本地网络
 
-When you want to talk to a specific pod without going through a service (for debugging or other reasons), Kubernetes allows you to configure port forwarding to the pod. This is done through the **kubectl port-forward** command. The following command will forward your machine’s local port **8888** to port **8080** of your **kubia-manual** pod:
+当你需要不通过service而访问特定的pod（例如为了debug或者其它理由）， Kubernetes允许你配置pod的端口转发。这通过 **kubectl port-forward** 指令完成。下面的指令会转寄你本地机器的端口 **8888** 到 你的 **kubia-manual** pod的 **8080** 端口。
 
 `kubectl port-forward kubia-manual 8888:8080`
 
-In a different terminal, you can now use curl to send an HTTP request to your pod through the kubectl port-forward proxy running on localhost:8888:
+在一个不同的终端中，你可以使用curl来通过运行于本地8888端口的kubectl port-forward代理向你的pod发送HTTP请求：
 
 `curl localhost:8888`
 > You've hit kubia-manual
 
-Using port forwarding like this is an effective way to test an individual pod.
+使用端口转发是测试单个pod的有效方式。
 
-### Introducing labels
+### 介绍标签（labels）
 
-Organizing pods and all other Kubernetes objects is done through labels. Labels are a simple, yet incredibly powerful, Kubernetes feature for organizing not only pods, but all other Kubernetes resources. A label is an arbitrary key-value pair you attach to a resource, which is then utilized when selecting resources using label selectors (resources are filtered based on whether they include the label specified in the selector). 
+我们通过标签（labels）来组织pod和其它所有的Kubernetes对象。标签是一种简单，但相当牛逼的Kubernetes特性以组织pod和其它Kubernetes资源。一个标签是你贴向一个资源的一组随意的key-value对，接着你可以通过选择表情来利用它（根据资源是否包含选择器中指定的标签来筛选资源）。
 
 #### Specifying labels when creating a pod
 
