@@ -53,13 +53,13 @@
     - [通过Kubectl logs取回pod日志](#通过kubectl-logs取回pod日志)
       - [在获取包含多个容器的pod的日志时标注容器的名称](#在获取包含多个容器的pod的日志时标注容器的名称)
     - [为pod的端口添加本地网络](#为pod的端口添加本地网络)
-  - [介绍标签（labels）](#介绍标签labels)
-    - [Specifying labels when creating a pod](#specifying-labels-when-creating-a-pod)
-    - [Modifying labels of existing pods](#modifying-labels-of-existing-pods)
-  - [Listing subsets of pods through label selectors](#listing-subsets-of-pods-through-label-selectors)
-    - [Listing pods using a label selector](#listing-pods-using-a-label-selector)
-    - [Using multiple conditions in a label selector](#using-multiple-conditions-in-a-label-selector)
-  - [Using labels and selectors to constrain pod scheduling](#using-labels-and-selectors-to-constrain-pod-scheduling)
+  - [介绍标签](#介绍标签)
+    - [在创建pod时指定标签](#在创建pod时指定标签)
+    - [修改已存在pod的标签](#修改已存在pod的标签)
+  - [通过标签选择器列出pod的子集](#通过标签选择器列出pod的子集)
+    - [通过标签选择器罗列pod](#通过标签选择器罗列pod)
+    - [在同一标签选择器中使用多个参数](#在同一标签选择器中使用多个参数)
+  - [利用标签限制pod调度](#利用标签限制pod调度)
     - [Using labels for categorizing worker nodes](#using-labels-for-categorizing-worker-nodes)
     - [Scheduling pods to specific nodes](#scheduling-pods-to-specific-nodes)
     - [Scheduling to one specific node](#scheduling-to-one-specific-node)
@@ -607,13 +607,13 @@ spec:
 
 使用端口转发是测试单个pod的有效方式。
 
-### 介绍标签（labels）
+### 介绍标签
 
-我们通过标签（labels）来组织pod和其它所有的Kubernetes对象。标签是一种简单，但相当牛逼的Kubernetes特性以组织pod和其它Kubernetes资源。一个标签是你贴向一个资源的一组随意的key-value对，接着你可以通过选择表情来利用它（根据资源是否包含选择器中指定的标签来筛选资源）。
+我们通过标签（labels）来组织pod和其它所有的Kubernetes对象。标签是一种简单、但相当牛逼的Kubernetes特性用以组织pod和其它Kubernetes资源。一个标签是你贴向一个资源的一组随意的key-value对，接着你可以通过选择表情来利用它（根据资源是否包含选择器中指定的标签来筛选资源）。
 
-#### Specifying labels when creating a pod
+#### 在创建pod时指定标签
 
-Now, you’ll see labels in action by creating a new pod with two labels. Create a new file called **kubia-manual-with-labels.yaml** with the contents of the following listing. You can also copy from [kubia-manual-with-labels.yaml](https://github.com/knrt10/kubernetes-basicLearning/blob/master/kubia-manual-with-labels.yaml)
+现在，通过创建一个包含两个标签的新pod，您将看到标签的运行情况。创建一个名为 **kubia-manual-with-labels.yaml** 的新文件，或者你可以从[kubia-manual-with-labels.yaml](https://github.com/knrt10/kubernetes-basicLearning/blob/master/kubia-manual-with-labels.yaml)复制。
 
 ```yaml
 apiVersion: v1
@@ -632,12 +632,12 @@ spec:
       protocol: TCP
 ```
 
-You’ve included the labels *creation_method=manual* and *env=data.labels* section. You’ll create this pod now:
+你已经包含了标签 *creation_method=manual* 和 *env=data.labels* 。你现在可以创建这一pod： 
 
 `kubectl create -f kubia-manual-with-labels.yaml`
 > pod/kubia-manual-v2 created
 
-The **kubectl get po** command doesn’t list any labels by default, but you can see them by using the **--show-labels** switch:
+**kubectl get po** 命令默认不会列出任何标签，但你可以通过 **--show-labels** 参数看见它们：
 
 `kubectl get po --show-labels`
 
@@ -650,32 +650,32 @@ kubia-manual      1/1       Running   0          7h        <none>
 kubia-manual-v2   1/1       Running   0          3m        creation_method=manual,env=prod
 ```
 
-Instead of listing all labels, if you’re only interested in certain labels, you can specify them with the **-L** switch and have each displayed in its own column. List pods again and show the columns for the two labels you’ve attached to your **kubia-manual-v2** pod:
+如果你只关心某一特定的label而非所有的label，你可以通过 **-L** 选项来寻找特定列。再次列出label并展示你在 **kubia-manual-v2** 所贴的label的特定列：
 
 `kubectl get po -L creation_method,env`
 
-#### Modifying labels of existing pods
+#### 修改已存在pod的标签
 
-Labels can also be added to and modified on existing pods. Because the **kubia-manual** pod was also created manually, let’s add the **creation_method=manual** label to it:
+已经存在的pod也可以被添加或者修改label。因为 **kubia-manual** pod已经被手动创建。让我们为它添加 **creation_method=manual（创建方法：手动）** 标签：
 
 `kubectl label po kubia-manual creation_method=manual`
 
-Now, let’s also change the **env=prod** label to **env=debug** on the **kubia-manual-v2** pod, to see how existing labels can be changed. You need to use the **--overwrite** option when changing existing labels.
+现在，让我们将 **kubia-manual-v2** pod的 **env=prod** 标签改为 **env=debug** 标签，来演示已存在的标签是如何被修改的。在修改已存在的标签时你需要添加 **--overwrite** 选项。
 
 `kubectl label po kubia-manual-v2 env=debug --overwrite`
 
-### Listing subsets of pods through label selectors
+### 通过标签选择器列出pod的子集
 
-Attaching labels to resources so you can see the labels next to each resource when listing them isn’t that interesting. But labels go hand in hand with *label selectors*. Label selectors allow you to select a subset of pods tagged with certain labels and perform an operation on those pods.
+将标签附加到资源中以便在列出标签时可以看到每个资源旁边的标签，这在列出资源时并不显得那么方便。但是标签与 *标签选择器（label selectors）* 是同步的。标签选择器允许您选择带有特定标签的pod的子集，并对这些pod执行操作。
 
-A label selector can select resources based on whether the resource
-- Contains (or doesn’t contain) a label with a certain key
-- Contains a label with a certain key and value
-- Contains a label with a certain key, but with a value not equal to the one you specify
+一个标签选择器可以通过以下方式选择资源：
+- 资源包含（或不包含）一个特定键（key）
+- 资源包含一个标签含有某一特定键值对（key-value pair）
+- 资源包含一个带有特定键的标签，但该键的值与你给出的特定值不同。
 
-#### Listing pods using a label selector
+#### 通过标签选择器罗列pod
 
-Let’s use label selectors on the pods you’ve created so far. To see all pods you created manually (you labeled them with **creation_method=manual**), do the following:
+让我们在你之前已经创建的pod上使用标签选择器。你可以通过以下指令来查看所有你之前手动创建的pod（你已经为它们带上了 **creation_method=manual** 标签）：
 
 `kubectl get po -l creation_method=manual`
 ```bash
@@ -684,7 +684,7 @@ kubia-manual      1/1       Running   0          22h
 kubia-manual-v2   1/1       Running   0          14h
 ```
 
-And those that don’t have the **env** label:
+可以用以下指令查看其中不带有 **env** 标签的pod：
 
 `kubectl get po -l '!env'`
 ```bash
@@ -695,16 +695,15 @@ kubia-bsksp    1/1       Running   1          5d
 kubia-manual   1/1       Running   0          22h
 ```
 
-Make sure to use single quotes around **!env**, so the bash shell doesn’t
-evaluate the exclamation mark
+确保在 **！env** 周围使用单引号，这样bash shell就不会计算感叹号。
 
-#### Using multiple conditions in a label selector
+#### 在同一标签选择器中使用多个参数
 
-A selector can also include multiple comma-separated criteria. Resources need to match all of them to match the selector. You can execute command given below
+一个标签选择器可以包含多个由逗号分割的选择标准。资源需要满足所有列出的选择标准。你可以执行下面给出的命令：
 
 `kubectl get po -l '!env , !creation_method' --show-labels`
 
-### Using labels and selectors to constrain pod scheduling
+### 利用标签限制pod调度
 
 All the pods you’ve created so far have been scheduled pretty much randomly across your worker nodes. Certain cases exist, however, where you’ll want to have at least a little say in where a pod should be scheduled. A good example is when your hardware infrastructure isn’t homogenous. You never want to say specifically what node a pod should be scheduled to, because that would couple the application to the infrastructure, whereas the whole idea of Kubernetes is hiding the actual infrastructure from the apps that run on it.
 
