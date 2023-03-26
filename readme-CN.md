@@ -60,7 +60,7 @@
     - [通过标签选择器罗列pod](#通过标签选择器罗列pod)
     - [在同一标签选择器中使用多个参数](#在同一标签选择器中使用多个参数)
   - [利用标签限制pod调度](#利用标签限制pod调度)
-    - [Using labels for categorizing worker nodes](#using-labels-for-categorizing-worker-nodes)
+    - [使用标签对工作节点分类](#使用标签对工作节点分类)
     - [Scheduling pods to specific nodes](#scheduling-pods-to-specific-nodes)
     - [Scheduling to one specific node](#scheduling-to-one-specific-node)
   - [Annotating pods](#annotating-pods)
@@ -705,9 +705,9 @@ kubia-manual   1/1       Running   0          22h
 
 ### 利用标签限制pod调度
 
-All the pods you’ve created so far have been scheduled pretty much randomly across your worker nodes. Certain cases exist, however, where you’ll want to have at least a little say in where a pod should be scheduled. A good example is when your hardware infrastructure isn’t homogenous. You never want to say specifically what node a pod should be scheduled to, because that would couple the application to the infrastructure, whereas the whole idea of Kubernetes is hiding the actual infrastructure from the apps that run on it.
+你先前创建的所有pod都被工作节点近似随机地调用。然而，在某些情况下，你可能会希望在一个pod该被放置在哪个位置上有一点发言权。比如，当您的硬件基础设施不是同一种的时候。你永远不想具体地说某个pod应该预定到哪个节点，因为这将把应用程序与基础设施结合起来，而k8s的整个思路是对运行在它上面的应用程序隐藏实际部署的基础设施。
 
-#### Using labels for categorizing worker nodes
+#### 使用标签对工作节点分类
 
 The pods aren't only kubernetes resource type that you can attach label to. Labels can be attached to any Kubernetes resource including nodes.
 
